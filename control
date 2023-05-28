@@ -1,0 +1,9 @@
+Package: cc.igerman.tiktokusregion
+Name: TikTokUSregion
+Version: 0.0.1
+Architecture: iphoneos-arm
+Description: Very simple TikTok tweak. Changes the region to the US, protects against jailbreak detection, removes ads.
+Maintainer: iGerman
+Author: iGerman
+Section: Tweaks
+Depends: mobilesubstrate (>= 0.9.5000)
