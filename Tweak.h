@@ -1,16 +1,24 @@
 #import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
+#import "TweakCommon.h"
 
-@interface AWEURLModel : NSObject
-@property(retain, nonatomic) NSArray* originURLList;
+@interface AWEFeedCellViewController : UIViewController
+@property(nonatomic, strong) UIView *view;
+@property(retain, nonatomic) AWEAwemeModel *model;
 @end
 
-@interface AWEVideoModel : NSObject
-@property(readonly, nonatomic) AWEURLModel* playURL;
-@property(readonly, nonatomic) AWEURLModel* downloadURL;
-@property(readonly, nonatomic) NSNumber *duration;
+@interface AWEAwemeDetailCellViewController : UIViewController
+@property(nonatomic, strong) UIView *view;
+@property(retain, nonatomic) AWEAwemeModel *model;
 @end
 
-@interface AWEAwemeModel : NSObject
-@property(nonatomic) BOOL isAds;
-@property(retain, nonatomic) AWEVideoModel* video;
+@interface TTKPhotoAlbumFeedCellController : UIViewController
+@property(nonatomic, strong) UIView *view;
+@property(retain, nonatomic) AWEAwemeModel *model;
+@end
+
+@interface TTKSettingsViewController : UIViewController
+@property(nonatomic, strong) UIView *view;
+- (void)tc_addTitCockSettings;
+- (void)tc_showSettings;
 @end

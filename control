@@ -1,8 +1,8 @@
 Package: cc.igerman.tiktokusregion
-Name: TikTokUSregion
-Version: 0.0.1
+Name: TitCock
+Version: 0.0.2
 Architecture: iphoneos-arm
-Description: Very simple TikTok tweak. Changes the region to the US, protects against jailbreak detection, removes ads.
+Description: Reasonably simple TikTok tweak. Changes the region to the US, protects against jailbreak detection, removes ads, adds a simple "fuck off and download" button (patent pending).
 Maintainer: iGerman
 Author: iGerman
 Section: Tweaks

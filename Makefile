@@ -11,7 +11,7 @@ PREFIX = $(THEOS)/toolchain/XcodeDefault.xctoolchain/usr/bin/
 TWEAK_NAME = TikTokUSregion
 
 TikTokUSregion_FILES = $(wildcard *.xm *.m)
-TikTokUSregion_CFLAGS = -fobjc-arc -Wno-deprecated-declarations -Wno-nullability-completeness -std=c++11
+TikTokUSregion_CFLAGS = -fobjc-arc -Wno-deprecated-declarations -Wno-nullability-completeness
 
 include $(THEOS_MAKE_PATH)/tweak.mk
 
