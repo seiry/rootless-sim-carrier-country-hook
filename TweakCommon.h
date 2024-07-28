@@ -47,6 +47,10 @@
 @interface UIViewController (DownloadHelpers) <QLPreviewControllerDataSource, NSURLSessionDownloadDelegate>
 @property (nonatomic, strong) NSTimer *suspenseTimer;
 @property (nonatomic, strong) NSURL *previewItemURL;
+@property (nonatomic, assign) NSUInteger totalPhotos;
+@property (nonatomic, assign) NSUInteger completedPhotos;
+@property (nonatomic, assign) int64_t totalBytes;
+@property (nonatomic, assign) int64_t downloadedBytes;
 - (UIView *)findSubviewOfClass:(Class)cls inView:(UIView *)view;
 - (UIView *)findStackViewContainingRightInteractionArea:(UIView *)view;
 - (BOOL)hasSubviewOfClass:(Class)cls inView:(UIView *)view;
@@ -63,4 +67,5 @@
 - (void)showCopiedAlert;
 - (void)updateDownloadProgress:(float)progress;
 - (void)stopDownloadAnimation:(UIButton *)button;
+- (void)downloadFileFromURL:(NSURL *)url isVideo:(BOOL)isVideo sender:(UIButton *)sender completion:(void (^)(void))completion;
 @end

@@ -2,7 +2,7 @@ Package: cc.igerman.tiktokusregion
 Name: TitCock
 Version: 0.0.2
 Architecture: iphoneos-arm
-Description: Reasonably simple TikTok tweak. Changes the region to the US, protects against jailbreak detection, removes ads, adds a simple "fuck off and download" button (patent pending).
+Description: spaghetti code tiktok tweak. changes the region to US, protects against jailbreak detection, removes ads, adds a download button to videos and photos. it also tries to hide stupid idiot LIVEs from the feed but idk if it works, i fucking hate them fuck them so hard
 Maintainer: iGerman
 Author: iGerman
 Section: Tweaks

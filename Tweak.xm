@@ -75,6 +75,17 @@
 }
 %end
 
+%hook TTKPhotoAlbumDetailCellController
+- (void)viewDidAppear:(BOOL)animated {
+    %orig;
+    [self viewDidAppearCommon:animated forViewController:self];
+}
+
+- (AWEAwemeModel *)currentModel {
+    return self.model;
+}
+%end
+
 // Settings hook
 %hook TTKSettingsViewController
 
@@ -101,9 +112,9 @@
 %new
 - (void)tc_showSettings {
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"TitCock"
-                                                                   message:@"Settings options will be implemented here."
+                                                                   message:@"if i figure out how to make this work, i'll add a settings page here, uwu"
                                                             preferredStyle:UIAlertControllerStyleAlert];
-    [alert addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"fuck off" style:UIAlertActionStyleDefault handler:nil]];
     [self presentViewController:alert animated:YES completion:nil];
 }
 

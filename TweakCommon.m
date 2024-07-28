@@ -5,6 +5,10 @@
 
 @dynamic suspenseTimer;
 @dynamic previewItemURL;
+@dynamic totalPhotos;
+@dynamic completedPhotos;
+@dynamic totalBytes;
+@dynamic downloadedBytes;
 
 - (AWEAwemeModel *)currentModel {
     return nil;
@@ -147,16 +151,14 @@
     AWEAwemeModel *model = [self currentModel];
 
     if (model.photoAlbum != nil) {
-        // Download every photo in the slideshow
-        for (AWEPhotoAlbumPhoto *imageModel in model.photoAlbum.photos) {
-            NSURL *imageURL = [NSURL URLWithString:imageModel.originPhotoURL.originURLList.firstObject];
-            if (!imageURL) {
-                NSLog(@"[TitCock] No image URL found");
-                continue;
-            }
-
-            [self downloadFileFromURL:imageURL isVideo:NO sender:sender];
-        }
+        // Reset progress for photo album
+        self.totalPhotos = model.photoAlbum.photos.count;
+        self.completedPhotos = 0;
+        self.totalBytes = 0;
+        self.downloadedBytes = 0;
+        
+        // Download photos in the slideshow sequentially
+        [self downloadPhotosSequentially:model.photoAlbum.photos currentIndex:0 sender:sender];
     } else {
         // Download video
         NSString *videoURLString = ((AWEVideoBSModel *)model.video.bitrateModels.firstObject).playAddr.originURLList.firstObject;
@@ -169,11 +171,42 @@
         }
 
         NSURL *videoURL = [NSURL URLWithString:videoURLString];
-        [self downloadFileFromURL:videoURL isVideo:YES sender:sender];
+        [self downloadFileFromURL:videoURL isVideo:YES sender:sender completion:^{
+            [self showSnackbarWithMessage:@"Video saved to Photos"];
+            [self stopDownloadAnimation:sender];
+            NSLog(@"[TitCock] Video download completed");
+        }];
     }
 }
 
-- (void)downloadFileFromURL:(NSURL *)url isVideo:(BOOL)isVideo sender:(UIButton *)sender {
+- (void)downloadPhotosSequentially:(NSArray *)photos currentIndex:(NSUInteger)index sender:(UIButton *)sender {
+    if (index >= photos.count) {
+        // All photos have been downloaded
+        [self stopDownloadAnimation:sender];
+        [self showSnackbarWithMessage:@"All images saved to Photos"];
+        return;
+    }
+
+    AWEPhotoAlbumPhoto *imageModel = photos[index];
+    NSURL *imageURL = [NSURL URLWithString:imageModel.originPhotoURL.originURLList.firstObject];
+    if (!imageURL) {
+        NSLog(@"[TitCock] No image URL found for index %lu", (unsigned long)index);
+        [self downloadPhotosSequentially:photos currentIndex:index + 1 sender:sender];
+        return;
+    }
+
+    [self downloadFileFromURL:imageURL isVideo:NO sender:sender completion:^{
+        // Update progress
+        self.completedPhotos++;
+        float progress = (float)self.completedPhotos / (float)self.totalPhotos;
+        [self updateDownloadProgress:progress];
+        
+        // Move to the next photo
+        [self downloadPhotosSequentially:photos currentIndex:index + 1 sender:sender];
+    }];
+}
+
+- (void)downloadFileFromURL:(NSURL *)url isVideo:(BOOL)isVideo sender:(UIButton *)sender completion:(void (^)(void))completion {
     NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
     configuration.timeoutIntervalForRequest = 30.0;
     configuration.timeoutIntervalForResource = 60.0;
@@ -193,19 +226,23 @@
     objc_setAssociatedObject(self, @selector(currentDownloadTask), downloadTask, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     objc_setAssociatedObject(self, @selector(currentDownloadButton), sender, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     objc_setAssociatedObject(self, @selector(currentDownloadIsVideo), @(isVideo), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    objc_setAssociatedObject(self, @selector(currentDownloadCompletion), completion, OBJC_ASSOCIATION_COPY_NONATOMIC);
 }
 
 - (void)URLSession:(NSURLSession *)session downloadTask:(NSURLSessionDownloadTask *)downloadTask didFinishDownloadingToURL:(NSURL *)location {
+    BOOL isVideo = [objc_getAssociatedObject(self, @selector(currentDownloadIsVideo)) boolValue];
+    UIButton *sender = objc_getAssociatedObject(self, @selector(currentDownloadButton));
+    void (^completion)(void) = objc_getAssociatedObject(self, @selector(currentDownloadCompletion));
+
     NSString *documentsPath = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)[0];
-    NSNumber *isVideo = objc_getAssociatedObject(self, @selector(currentDownloadIsVideo));
-    NSString *fileExtension = [isVideo boolValue] ? @"mp4" : @"jpg";
+    NSString *fileExtension = isVideo ? @"mp4" : @"jpg";
     NSString *filePath = [documentsPath stringByAppendingPathComponent:[NSString stringWithFormat:@"%ld.%@", (long)[NSDate date].timeIntervalSince1970, fileExtension]];
     NSURL *destinationURL = [NSURL fileURLWithPath:filePath];
 
     NSFileManager *fileManager = [NSFileManager defaultManager];
     [fileManager moveItemAtURL:location toURL:destinationURL error:nil];
 
-    if ([isVideo boolValue]) {
+    if (isVideo) {
         [self saveVideoToPhotos:destinationURL];
     } else {
         [self saveImageToPhotos:destinationURL];
@@ -215,13 +252,11 @@
         if ([fileManager fileExistsAtPath:filePath]) {
             [fileManager removeItemAtPath:filePath error:nil];
         }
+        if (!isVideo) {
+            [self stopDownloadAnimation:sender];
+        }
+        if (completion) completion();
     });
-
-    [self stopDownloadAnimation:objc_getAssociatedObject(self, @selector(currentDownloadButton))];
-
-    // Show snackbar message
-    NSString *message = [isVideo boolValue] ? @"Video saved to Photos" : @"Image saved to Photos";
-    [self showSnackbarWithMessage:message];
 }
 
 - (void)showSnackbarWithMessage:(NSString *)message {
@@ -251,8 +286,15 @@
 }
 
 - (void)URLSession:(NSURLSession *)session downloadTask:(NSURLSessionDownloadTask *)downloadTask didWriteData:(int64_t)bytesWritten totalBytesWritten:(int64_t)totalBytesWritten totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite {
-    float progress = (float)totalBytesWritten / (float)totalBytesExpectedToWrite;
-    [self updateDownloadProgress:progress];
+    BOOL isVideo = [objc_getAssociatedObject(self, @selector(currentDownloadIsVideo)) boolValue];
+    
+    if (isVideo) {
+        float progress = (float)totalBytesWritten / (float)totalBytesExpectedToWrite;
+        [self updateDownloadProgress:progress];
+    } else {
+        self.downloadedBytes += bytesWritten;
+        self.totalBytes += totalBytesExpectedToWrite;
+    }
 }
 
 - (void)updateDownloadProgress:(float)progress {

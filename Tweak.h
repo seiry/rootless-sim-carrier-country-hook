@@ -17,6 +17,11 @@
 @property(retain, nonatomic) AWEAwemeModel *model;
 @end
 
+@interface TTKPhotoAlbumDetailCellController : UIViewController
+@property(nonatomic, strong) UIView *view;
+@property(retain, nonatomic) AWEAwemeModel *model;
+@end
+
 @interface TTKSettingsViewController : UIViewController
 @property(nonatomic, strong) UIView *view;
 - (void)tc_addTitCockSettings;
