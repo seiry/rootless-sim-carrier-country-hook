@@ -4,8 +4,8 @@ TARGET = iphone:clang:14.5
 
 TWEAK_NAME = rootless-sim-carrier-country-hook
 
-rootless-sim-carrier-country-hook2_FILES = Tweak.x
-rootless-sim-carrier-country-hook2_CFLAGS = -fobjc-arc
+rootless-sim-carrier-country-hook_FILES = Tweak.x
+rootless-sim-carrier-country-hook_CFLAGS = -fobjc-arc
 
 
 THEOS_PACKAGE_SCHEME = rootless
