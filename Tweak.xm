@@ -1,6 +1,7 @@
 #import <rootless.h>
 #import <objc/runtime.h>
 #import <CoreTelephony/CTCarrier.h>
+#import <Foundation/Foundation.h>
 
 // Region changing to the USA
 %hook CTCarrier

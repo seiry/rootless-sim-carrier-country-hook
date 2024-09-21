@@ -1,9 +1,9 @@
-Package: cc.igerman.tiktokusregion
-Name: TitCock
-Version: 0.0.2
+Package: xi.fuckcpp.rootless-sim-carrier-country-hook
+Name: rootless-sim-carrier-country-hook2
+Version: 0.0.1
 Architecture: iphoneos-arm
-Description: spaghetti code tiktok tweak. changes the region to US, protects against jailbreak detection, removes ads, adds a download button to videos and photos. it also tries to hide stupid idiot LIVEs from the feed but idk if it works, i fucking hate them fuck them so hard
-Maintainer: iGerman
-Author: iGerman
+Description: An awesome MobileSubstrate tweak!
+Maintainer: Xi
+Author: Xi
 Section: Tweaks
 Depends: mobilesubstrate (>= 0.9.5000)
